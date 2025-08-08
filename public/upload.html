@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Upload Image - Art Gallery</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <!-- Google Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&family=Gloria+Hallelujah&display=swap" rel="stylesheet">
+  <style>
+    :root{
+      --blue: #007aff;
+      --blue-2: #00c6fb;
+      --accent: #e17055;
+      --border: #e9ecef;
+      --muted: #64748b;
+      --shadow: 0 8px 32px rgba(16,24,40,.08);
+    }
+    * { box-sizing: border-box; }
+    html, body { height: 100%; }
+    body {
+      margin: 0;
+      font-family: 'Inter', Arial, sans-serif;
+      color: #1f2937;
+      min-height: 100vh;
+      padding: 0 0 72px 0; /* space for bottom bar */
+      background-image:
+        radial-gradient(1200px 800px at 50% 20%, rgba(255,255,255,0.55), rgba(255,255,255,0.25) 45%, rgba(255,255,255,0.08) 70%, rgba(255,255,255,0.02) 85%),
+        /* linear-gradient(135deg, #f8fafc 0%, #e9ecef 100%), */
+        url('desktop.jpg');
+      background-size: cover;
+      background-position: center;
+      background-repeat: no-repeat;
+    }
+    @media (max-width: 600px) {
+      body {
+        background-image:
+          radial-gradient(900px 600px at 50% 20%, rgba(255,255,255,0.55), rgba(255,255,255,0.25) 45%, rgba(255,255,255,0.08) 70%, rgba(255,255,255,0.02) 85%),
+          /* linear-gradient(135deg, #f8fafc 0%, #e9ecef 100%), */
+          url('mobile.jpg');
+      }
+    }
+
+    .upload-card {
+      width: min(92vw, 480px);
+      margin: 28px auto 18px;
+      background: rgba(255,255,255,0.75);
+      border: 1px solid rgba(255,255,255,0.65);
+      border-radius: 20px;
+      backdrop-filter: blur(12px) saturate(140%);
+      -webkit-backdrop-filter: blur(12px) saturate(140%);
+      box-shadow: var(--shadow);
+      padding: 24px 18px 18px;
+    }
+    .upload-title {
+      font-family: 'Gloria Hallelujah', cursive, Arial, sans-serif;
+      font-size: 1.6rem;
+      color: var(--blue);
+      text-align: center;
+      letter-spacing: .5px;
+      text-shadow: 1px 1px 0 #fff, 2px 2px 0 #fdcb6e;
+      margin: 2px 0 14px;
+    }
+
+    #uploadForm { display: grid; gap: 14px; }
+
+    .dropzone {
+      position: relative;
+      border: 2px dashed var(--border);
+      border-radius: 14px;
+      padding: 22px 14px;
+      background: #fff;
+      text-align: center;
+      transition: border-color .2s, background .2s, box-shadow .2s;
+      cursor: pointer;
+    }
+    .dropzone:hover { border-color: var(--blue); box-shadow: 0 8px 24px rgba(0,122,255,.10); }
+    .dropzone.dragover { border-color: var(--blue); background: #f5f9ff; }
+    .dz-icon { font-size: 2rem; }
+    .dz-title { font-weight: 700; margin-top: 6px; }
+    .dz-sub { color: var(--muted); font-size: .92rem; margin-top: 4px; }
+    .dz-sub small { color: #94a3b8; }
+
+    .hidden { display: none !important; }
+
+    .preview {
+      display: grid; grid-template-columns: 96px 1fr auto; gap: 12px; align-items: center;
+      background: #fff; border: 1.5px solid var(--border); border-radius: 14px; padding: 10px;
+    }
+    .preview-thumb {
+      width: 96px; height: 96px; border-radius: 10px; object-fit: cover; background: #f8fafc; border: 1px solid var(--border);
+    }
+    .meta-title { font-weight: 700; }
+    .meta-sub { color: var(--muted); font-size: .92rem; }
+    .meta-actions { display: flex; gap: 8px; }
+    .btn {
+      padding: 8px 12px; border-radius: 10px; border: 1.5px solid var(--border); background: #fff; font-weight: 600; cursor: pointer;
+      transition: background .2s, box-shadow .2s, transform .06s, border .2s;
+    }
+    .btn:hover { background: #f7fafc; }
+    .btn:active { transform: translateY(1px); }
+    .btn.primary {
+      background: linear-gradient(90deg, var(--blue) 0%, var(--blue-2) 100%); color: #fff; border-color: transparent;
+      box-shadow: 0 8px 20px rgba(0,122,255,.18);
+    }
+    .btn.primary:hover { filter: brightness(1.05); }
+
+    .progress {
+      height: 10px; background: #eef2f7; border-radius: 999px; overflow: hidden; display: none;
+    }
+    .progress .bar {
+      width: 30%; height: 100%; background: linear-gradient(90deg, var(--blue), var(--blue-2)); border-radius: inherit;
+      animation: indet 1.2s infinite ease-in-out;
+    }
+    @keyframes indet {
+      0% { transform: translateX(-100%); }
+      50% { transform: translateX(20%); }
+      100% { transform: translateX(120%); }
+    }
+
+    .tips { text-align: center; color: var(--muted); font-size: .9rem; margin-top: 4px; }
+    .tips b { color: var(--accent); }
+
+    /* Bottom Navigation Bar */
+    .bottom-bar {
+      position: fixed; left: 0; right: 0; bottom: 0; height: 60px; background: #fff;
+      border-top: 1.5px solid var(--border); box-shadow: 0 -2px 12px rgba(0,0,0,0.04);
+      display: flex; justify-content: space-around; align-items: center; z-index: 100;
+    }
+    .bottom-bar a {
+      flex: 1; text-align: center; color: #636e72; text-decoration: none; font-size: 1.05rem; font-weight: 600;
+      padding: 0.5em 0; border-radius: 10px; transition: background .2s, color .2s; display: flex; flex-direction: column; align-items: center;
+    }
+    .bottom-bar a.active, .bottom-bar a:hover { background: #f1f3f6; color: var(--blue); }
+    .icon { font-size: 1.35em; margin-bottom: 2px; display: block; }
+
+    @media (max-width: 600px) {
+      .upload-card { width: 96vw; padding: 18px 14px; }
+      .preview { grid-template-columns: 74px 1fr auto; }
+      .preview-thumb { width: 74px; height: 74px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="upload-card">
+    <div class="upload-title">Upload Your Art</div>
+
+    <form id="uploadForm" enctype="multipart/form-data">
+      <!-- Dropzone -->
+      <label class="dropzone" id="dropzone">
+        <input type="file" id="image" name="image" accept="image/*" class="hidden" required capture="environment">
+        <div class="dz-icon">☁️⬆️</div>
+        <div class="dz-title">Drag & drop your image here</div>
+        <div class="dz-sub">or click to browse • JPG/PNG/GIF • <small>Max 10MB</small></div>
+      </label>
+
+      <!-- Preview -->
+      <div class="preview hidden" id="preview">
+        <img id="previewImg" class="preview-thumb" alt="Preview">
+        <div>
+          <div class="meta-title" id="fileName">—</div>
+          <div class="meta-sub"><span id="fileSize">—</span></div>
+        </div>
+        <div class="meta-actions">
+          <button type="button" class="btn" id="clearBtn">Clear</button>
+        </div>
+      </div>
+
+      <!-- Progress (shown on submit) -->
+      <div class="progress" id="progress"><div class="bar"></div></div>
+
+      <!-- Submit -->
+      <button type="submit" class="btn primary" id="submitBtn" disabled>Upload</button>
+      <div class="tips">Tip: use the <b>same name</b> when logging in to keep seeing your uploads (demo auth).</div>
+    </form>
+  </div>
+
+  <!-- Bottom Navigation Bar -->
+  <nav class="bottom-bar">
+    <a href="dashboard.html"><span class="icon"><img src="home.png" alt="" height="20px"></span>Home</a>
+    <a href="public.html"><span class="icon"><img src="gallery.png" alt="" height="20px"></span>Gallery</a>
+    <a href="upload.html" class="active"><span class="icon"><img src="upload.png" alt="" height="20px"></span>Upload</a>
+    <a href="profile.html"><span class="icon"><img src="profile.png" alt="" height="20px"></span>Profile</a>
+    <a href="index.html" onclick="localStorage.clear()"><span class="icon"><img src="logout.png" alt="" height="20px"></span>Logout</a>
+  </nav>
+
+  <script>
+    // UI enhancements: drag & drop, preview, file meta, submit state
+    const form = document.getElementById('uploadForm');
+    const input = document.getElementById('image');
+    const dropzone = document.getElementById('dropzone');
+    const preview = document.getElementById('preview');
+    const previewImg = document.getElementById('previewImg');
+    const fileName = document.getElementById('fileName');
+    const fileSize = document.getElementById('fileSize');
+    const clearBtn = document.getElementById('clearBtn');
+    const submitBtn = document.getElementById('submitBtn');
+    const progress = document.getElementById('progress');
+
+    const MAX_MB = 10;
+
+    function fmtBytes(bytes) {
+      if (bytes === 0) return '0 B';
+      const k = 1024, sizes = ['B','KB','MB','GB'];
+      const i = Math.floor(Math.log(bytes) / Math.log(k));
+      return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+    }
+
+    function showPreview(file) {
+      if (!file) return;
+      if (!file.type.startsWith('image/')) { alert('Please select an image file.'); return clearSelection(); }
+      if (file.size > MAX_MB * 1024 * 1024) { alert(`File is too large. Max ${MAX_MB}MB.`); return clearSelection(); }
+
+      const reader = new FileReader();
+      reader.onload = e => { previewImg.src = e.target.result; };
+      reader.readAsDataURL(file);
+
+      fileName.textContent = file.name;
+      fileSize.textContent = fmtBytes(file.size);
+      preview.classList.remove('hidden');
+      submitBtn.disabled = false;
+    }
+
+    function clearSelection() {
+      input.value = '';
+      previewImg.src = '';
+      preview.classList.add('hidden');
+      submitBtn.disabled = true;
+    }
+
+    // Clicking dropzone opens file dialog
+    dropzone.addEventListener('click', () => input.click());
+
+    // Highlight on drag
+    ['dragenter','dragover'].forEach(ev =>
+      dropzone.addEventListener(ev, (e) => { e.preventDefault(); e.stopPropagation(); dropzone.classList.add('dragover'); })
+    );
+    ['dragleave','dragend','drop'].forEach(ev =>
+      dropzone.addEventListener(ev, (e) => { e.preventDefault(); e.stopPropagation(); dropzone.classList.remove('dragover'); })
+    );
+    dropzone.addEventListener('drop', (e) => {
+      const file = e.dataTransfer.files && e.dataTransfer.files[0];
+      if (!file) return;
+      // Set input files so the existing upload handler can use it
+      if (DataTransfer && input.files) {
+        const dt = new DataTransfer();
+        dt.items.add(file);
+        input.files = dt.files;
+      }
+      showPreview(file);
+    });
+
+    // File input change
+    input.addEventListener('change', (e) => {
+      const file = e.target.files && e.target.files[0];
+      if (!file) { clearSelection(); return; }
+      showPreview(file);
+    });
+
+    // Clear selection
+    clearBtn.addEventListener('click', clearSelection);
+
+    // Submit state (do not prevent default — your script.js handles upload)
+    form.addEventListener('submit', () => {
+      submitBtn.disabled = true;
+      submitBtn.textContent = 'Uploading...';
+      progress.style.display = 'block';
+    });
+  </script>
+
+  <!-- Keep your existing upload logic if you use script.js -->
+  <script src="script.js"></script>
+</body>
+</html>

@@ -1,0 +1,387 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Profile - Art Gallery</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <!-- Google Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&family=Gloria+Hallelujah&display=swap" rel="stylesheet">
+  <style>
+    :root{
+      --accent: #e17055;
+      --accent-2: #fdcb6e;
+      --border: #e9ecef;
+      --muted: #64748b;
+      --shadow: 0 8px 32px rgba(16, 24, 40, 0.08);
+    }
+    * { box-sizing: border-box; }
+    html, body { height: 100%; }
+    body {
+      margin: 0;
+      font-family: 'Inter', Arial, sans-serif;
+      color: #1f2937;
+      min-height: 100vh;
+      padding: 0 0 72px 0; /* space for bottom bar */
+      background-image:
+        radial-gradient(1200px 800px at 50% 20%, rgba(255,255,255,0.55), rgba(255,255,255,0.25) 45%, rgba(255,255,255,0.08) 70%, rgba(255,255,255,0.02) 85%),
+        /* linear-gradient(135deg, #f8fafc 0%, #e9ecef 100%), */
+        url('desktop.jpg');
+      background-size: cover;
+      background-position: center;
+      background-repeat: no-repeat;
+    }
+    @media (max-width: 600px) {
+      body {
+        background-image:
+          radial-gradient(900px 600px at 50% 20%, rgba(255,255,255,0.55), rgba(255,255,255,0.25) 45%, rgba(255,255,255,0.08) 70%, rgba(255,255,255,0.02) 85%),
+          /* linear-gradient(135deg, #f8fafc 0%, #e9ecef 100%), */
+          url('mobile.jpg');
+      }
+    }
+
+    /* Header / Profile Card */
+    .profile-wrap { max-width: 1100px; margin: 24px auto 12px; padding: 0 16px; }
+    .profile-card {
+      position: relative;
+      display: grid;
+      grid-template-columns: auto 1fr auto;
+      gap: 14px;
+      align-items: center;
+      background: rgba(255,255,255,0.72);
+      border: 1px solid rgba(255,255,255,0.7);
+      border-radius: 18px;
+      padding: 14px 14px 14px 90px;
+      backdrop-filter: blur(10px) saturate(140%);
+      -webkit-backdrop-filter: blur(10px) saturate(140%);
+      box-shadow: var(--shadow);
+    }
+    .avatar {
+      position: absolute; left: 14px; top: 50%; transform: translateY(-50%);
+      width: 64px; height: 64px; border-radius: 50%;
+      display: grid; place-items: center; font-weight: 700;
+      color: var(--accent);
+      background: linear-gradient(135deg, #fff6e6, #ffe2cf);
+      border: 2.5px solid var(--accent);
+      box-shadow: 0 8px 20px rgba(225,112,85,.18);
+      font-size: 1.4rem;
+      font-family: 'Gloria Hallelujah', cursive, Arial, sans-serif;
+    }
+    .p-name {
+      font-family: 'Gloria Hallelujah', cursive, Arial, sans-serif;
+      font-size: 1.5rem; color: var(--accent);
+      margin: 0; letter-spacing: .5px;
+      text-shadow: 1px 1px 0 #fff, 2px 2px 0 var(--accent-2);
+    }
+    .p-sub { margin: 2px 0 0; color: var(--muted); }
+    .p-actions { display: flex; gap: 8px; flex-wrap: wrap; }
+    .btn {
+      padding: 8px 12px; border-radius: 12px; border: 1.5px solid var(--border);
+      background: #fff; color: #111827; font-weight: 600; cursor: pointer;
+      transition: background .2s, box-shadow .2s, transform .06s, border .2s;
+    }
+    .btn:hover { background: #f7fafc; }
+    .btn:active { transform: translateY(1px); }
+    .btn.primary {
+      background: linear-gradient(90deg, var(--accent) 0%, var(--accent-2) 100%); color: #fff; border-color: transparent;
+      box-shadow: 0 8px 20px rgba(225,112,85,.18);
+    }
+    .btn.primary:hover { filter: brightness(1.05); }
+
+    /* Stats */
+    .stats {
+      display: flex; gap: 10px; flex-wrap: wrap; margin-top: 8px;
+    }
+    .stat-pill {
+      background: #fff; border: 1px solid var(--border); border-radius: 999px;
+      padding: 6px 12px; font-weight: 600; color: #111827; font-size: .9rem;
+    }
+
+    /* Controls */
+    .controls {
+      max-width: 1100px; margin: 10px auto 8px; padding: 0 16px;
+      display: flex; gap: 10px; flex-wrap: wrap;
+    }
+    .select {
+      border: 1.5px solid var(--border); border-radius: 12px; padding: 8px 12px; background: #fff; font-weight: 600;
+    }
+
+    /* Grid */
+    .grid {
+      max-width: 1100px; margin: 10px auto 28px; padding: 0 16px;
+      display: grid; gap: 16px; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+    }
+    @media (max-width: 600px) { .grid { grid-template-columns: repeat(auto-fill, minmax(110px, 1fr)); gap: 10px; } }
+
+    .card {
+      background: #fff; border: 1.5px solid var(--border); border-radius: 16px; box-shadow: var(--shadow);
+      overflow: hidden; position: relative; transition: transform .2s, box-shadow .2s, border-color .2s;
+    }
+    .card:hover { transform: translateY(-2px); border-color: var(--accent); box-shadow: 0 16px 40px rgba(225,112,85,0.12); }
+    .imgbox { position: relative; aspect-ratio: 1/1; display: flex; align-items: center; justify-content: center; overflow: hidden; }
+    .imgbox img { width: 100%; height: 100%; object-fit: cover; display: block; }
+    .actions {
+      position: absolute; top: 8px; right: 8px; display: flex; gap: 6px; opacity: 0; transform: translateY(-6px);
+      transition: opacity .2s, transform .2s; z-index: 2;
+    }
+    .card:hover .actions { opacity: 1; transform: translateY(0); }
+    @media (hover: none) { .actions { opacity: 1; transform: none; } }
+    .icon-btn {
+      background: rgba(255,255,255,0.95); border: none; width: 34px; height: 34px; border-radius: 50%;
+      display: grid; place-items: center; color: #475569; cursor: pointer; box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+      transition: background .2s, color .2s, transform .08s;
+    }
+    .icon-btn:hover { background: #eef2f7; color: var(--accent); }
+    .icon-btn:active { transform: translateY(1px); }
+
+    .empty {
+      grid-column: 1 / -1; text-align: center; color: var(--muted); background: rgba(255,255,255,.7);
+      border: 1px dashed var(--border); padding: 18px; border-radius: 14px;
+    }
+
+    /* Skeletons */
+    .skeleton { background: #fff; border-radius: 16px; border: 1.5px solid var(--border); overflow: hidden; }
+    .sk-img { aspect-ratio: 1/1; width: 100%; background: linear-gradient(90deg, #f4f6f8 25%, #e9edf2 37%, #f4f6f8 63%); background-size: 400% 100%; animation: shimmer 1.2s infinite; }
+    .sk-cap { height: 36px; background: #fff; }
+    @keyframes shimmer { 0%{background-position: 100% 0} 100%{background-position: 0 0} }
+
+    /* Lightbox */
+    .lightbox { position: fixed; inset: 0; background: rgba(0,0,0,0.6); display: none; align-items: center; justify-content: center; z-index: 200; padding: 20px; }
+    .lightbox.open { display: flex; }
+    .lightbox-inner { background: #fff; border-radius: 16px; max-width: 92vw; max-height: 88vh; display: grid; gap: 10px; padding: 12px; box-shadow: var(--shadow); }
+    .lightbox-img { max-width: 86vw; max-height: 70vh; object-fit: contain; border-radius: 12px; }
+    .lightbox-actions { display: flex; justify-content: space-between; align-items: center; gap: 10px; }
+    .lb-left { font-weight: 600; color: #111827; }
+    .lb-right { display: flex; gap: 8px; }
+    .icon-btn.danger:hover { color: #ef4444; }
+
+    /* Toast */
+    .toast { position: fixed; bottom: 76px; left: 50%; transform: translateX(-50%); padding: 10px 14px; border-radius: 10px; background: rgba(17,24,39,.9); color: #fff; font-size: .95rem; display: none; z-index: 250; }
+    .toast.show { display: block; animation: fadeOut 2.2s both; }
+    @keyframes fadeOut { 0%{opacity:0} 10%{opacity:1} 80%{opacity:1} 100%{opacity:0} }
+
+    /* Bottom bar */
+    .bottom-bar { position: fixed; left: 0; right: 0; bottom: 0; height: 60px; background: #fff; border-top: 1.5px solid var(--border); box-shadow: 0 -2px 12px rgba(0,0,0,0.04); display: flex; justify-content: space-around; align-items: center; z-index: 100; }
+    .bottom-bar a { flex: 1; text-align: center; color: #636e72; text-decoration: none; font-size: 1.05rem; font-weight: 600; padding: 0.5em 0; border-radius: 10px; transition: background .2s, color .2s; display: flex; flex-direction: column; align-items: center; }
+    .bottom-bar a.active, .bottom-bar a:hover { background: #f1f3f6; color: var(--accent); }
+    .icon { font-size: 1.35em; margin-bottom: 2px; display: block; }
+  </style>
+</head>
+<body>
+
+  <div class="profile-wrap">
+    <div class="profile-card">
+      <div class="avatar" id="profileAvatar">🎨</div>
+      <div>
+        <h1 class="p-name" id="profileName">Artist</h1>
+        <p class="p-sub" id="profileTag">Your creative space</p>
+        <div class="stats">
+          <span class="stat-pill" id="statUploads">0 uploads</span>
+        </div>
+      </div>
+      <div class="p-actions">
+        <a class="btn" href="public.html">View public</a>
+        <a class="btn primary" href="upload.html">Upload new</a>
+      </div>
+    </div>
+  </div>
+
+  <div class="controls">
+    <label>
+      <select id="sort" class="select">
+        <option value="new">Sort: Newest first</option>
+        <option value="old">Sort: Oldest first</option>
+        <option value="az">Sort: Name A–Z</option>
+        <option value="za">Sort: Name Z–A</option>
+      </select>
+    </label>
+  </div>
+
+  <div class="grid" id="profileImages">
+    <!-- skeletons / cards -->
+  </div>
+
+  <!-- Lightbox -->
+  <div class="lightbox" id="lightbox" aria-modal="true" role="dialog">
+    <div class="lightbox-inner">
+      <img id="lbImg" class="lightbox-img" src="" alt="">
+      <div class="lightbox-actions">
+        <div class="lb-left" id="lbCaption"></div>
+        <div class="lb-right">
+          <button class="icon-btn" id="lbDownload" title="Download">
+            <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v8m0 0l-4-4m4 4l4-4M5 19h14"/></svg>
+          </button>
+          <button class="icon-btn danger" id="lbDelete" title="Delete">
+            <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m5 0V4a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2v2"></path></svg>
+          </button>
+          <button class="icon-btn" id="lbClose" title="Close">
+            <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 6l12 12M18 6L6 18"/></svg>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast -->
+  <div class="toast" id="toast">Done</div>
+
+  <!-- Bottom Navigation Bar -->
+  <nav class="bottom-bar">
+    <a href="dashboard.html"><span class="icon"><img src="home.png" alt="" height="20px"></span>Home</a>
+    <a href="public.html"><span class="icon"><img src="gallery.png" alt="" height="20px"></span>Gallery</a>
+    <a href="upload.html" ><span class="icon"><img src="upload.png" alt="" height="20px"></span>Upload</a>
+    <a href="profile.html" class="active"><span class="icon"><img src="profile.png" alt="" height="20px"></span>Profile</a>
+    <a href="index.html" onclick="localStorage.clear()"><span class="icon"><img src="logout.png" alt="" height="20px"></span>Logout</a>
+  </nav>
+
+
+  <script>
+    const grid = document.getElementById('profileImages');
+    const nameEl = document.getElementById('profileName');
+    const tagEl = document.getElementById('profileTag');
+    const avatarEl = document.getElementById('profileAvatar');
+    const uploadsEl = document.getElementById('statUploads');
+    const sortEl = document.getElementById('sort');
+    const lb = document.getElementById('lightbox');
+    const lbImg = document.getElementById('lbImg');
+    const lbCaption = document.getElementById('lbCaption');
+    const lbDownload = document.getElementById('lbDownload');
+    const lbDelete = document.getElementById('lbDelete');
+    const lbClose = document.getElementById('lbClose');
+    const toast = document.getElementById('toast');
+
+    let images = [];
+    let currentUser = '';
+
+    function showSkeletons(count = 8) {
+      grid.innerHTML = Array.from({ length: count }).map(() => `
+        <div class="skeleton">
+          <div class="sk-img"></div>
+          <div class="sk-cap"></div>
+        </div>
+      `).join('');
+    }
+    showSkeletons();
+
+    fetch('/api/profile', { headers: { 'x-session-id': localStorage.getItem('sessionId') || '' } })
+      .then(res => res.json())
+      .then(data => {
+        if (data.error) { window.location = 'index.html'; return; }
+        currentUser = data.name || '';
+        nameEl.textContent = currentUser || 'Artist';
+        tagEl.textContent = 'Your creative space';
+        avatarEl.textContent = currentUser ? currentUser.trim()[0].toUpperCase() : '🎨';
+        images = Array.isArray(data.images) ? data.images : [];
+        uploadsEl.textContent = `${images.length} upload${images.length !== 1 ? 's' : ''}`;
+        render();
+      });
+
+    function render() {
+      const sorted = sortImages([...images], sortEl.value);
+      if (!sorted.length) {
+        grid.innerHTML = `<div class="empty">No images uploaded yet.</div>`;
+        return;
+      }
+      grid.innerHTML = sorted.map(img => `
+        <div class="card" data-fn="${img.filename}">
+          <div class="imgbox" role="button" tabindex="0" aria-label="View image">
+            <img loading="lazy" src="/uploads/${img.filename}" alt="Artwork">
+            <div class="actions">
+              <button class="icon-btn" title="Download" data-act="download">
+                <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v8m0 0l-4-4m4 4l4-4M5 19h14"/></svg>
+              </button>
+              <button class="icon-btn danger" title="Delete" data-act="delete">
+                <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m5 0V4a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2v2"></path></svg>
+              </button>
+            </div>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    function sortImages(arr, mode) {
+      if (mode === 'old') return arr.sort((a,b) => ts(a) - ts(b));
+      if (mode === 'az') return arr.sort((a,b) => (a.filename > b.filename ? 1 : -1));
+      if (mode === 'za') return arr.sort((a,b) => (a.filename < b.filename ? 1 : -1));
+      return arr.sort((a,b) => ts(b) - ts(a)); // new
+    }
+    function ts(img) {
+      // filenames are Date.now() + ext (from server.js); parse numeric prefix
+      const n = parseInt((img.filename || '').split('.')[0], 10);
+      return isNaN(n) ? 0 : n;
+    }
+    sortEl.addEventListener('change', render);
+
+    // Delegated actions
+    grid.addEventListener('click', (e) => {
+      const card = e.target.closest('.card');
+      if (!card) return;
+      const fn = card.dataset.fn;
+      const btn = e.target.closest('[data-act]');
+      if (btn) {
+        const act = btn.getAttribute('data-act');
+        if (act === 'download') return downloadImage(fn);
+        if (act === 'delete') return deleteImage(fn, card);
+      } else {
+        openLightbox(fn);
+      }
+    });
+
+    // Lightbox handlers
+    function openLightbox(filename) {
+      lbImg.src = '/uploads/' + filename;
+      lbImg.alt = 'Artwork';
+      lbCaption.textContent = '@' + (currentUser || 'you');
+      lbDownload.onclick = () => downloadImage(filename);
+      lbDelete.onclick = () => deleteImage(filename, null, true);
+      lb.classList.add('open');
+    }
+    lbClose.addEventListener('click', () => lb.classList.remove('open'));
+    lb.addEventListener('click', (e) => { if (e.target === lb) lb.classList.remove('open'); });
+    document.addEventListener('keydown', (e) => { if (e.key === 'Escape') lb.classList.remove('open'); });
+
+    // Download
+    function downloadImage(filename) {
+      const a = document.createElement('a');
+      a.href = '/uploads/' + filename;
+      a.download = filename;
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      showToast('Downloading...');
+    }
+
+    // Delete
+    function deleteImage(filename, cardEl, fromLightbox = false) {
+      if (!confirm('Delete this image?')) return;
+      fetch('/api/delete', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'x-session-id': localStorage.getItem('sessionId') || ''
+        },
+        body: JSON.stringify({ filename })
+      })
+      .then(r => r.json())
+      .then(res => {
+        if (res.success) {
+          images = images.filter(i => i.filename !== filename);
+          uploadsEl.textContent = `${images.length} upload${images.length !== 1 ? 's' : ''}`;
+          if (cardEl) cardEl.remove();
+          if (fromLightbox) lb.classList.remove('open');
+          render();
+          showToast('Image deleted');
+        } else {
+          alert(res.error || 'Delete failed');
+        }
+      })
+      .catch(() => alert('Delete failed'));
+    }
+
+    // Toast
+    function showToast(msg) {
+      toast.textContent = msg;
+      toast.classList.add('show');
+      setTimeout(() => toast.classList.remove('show'), 2200);
+    }
+  </script>
+</body>
+</html>

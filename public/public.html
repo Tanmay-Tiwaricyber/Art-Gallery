@@ -1,0 +1,401 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Public Gallery</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <!-- Google Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&family=Gloria+Hallelujah&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --accent: #007aff;
+      --accent-2: #00c6fb;
+      --danger: #ef4444;
+      --card: #ffffff;
+      --muted: #64748b;
+      --border: #e9ecef;
+      --shadow: 0 8px 32px rgba(16, 24, 40, 0.08);
+    }
+    * { box-sizing: border-box; }
+    html, body { height: 100%; }
+    body {
+      margin: 0;
+      font-family: 'Inter', Arial, sans-serif;
+      color: #1f2937;
+      min-height: 100vh;
+      padding: 0 0 72px 0; /* space for bottom bar */
+      background-image:
+        radial-gradient(1200px 800px at 50% 20%, rgba(255,255,255,0.55), rgba(255,255,255,0.25) 45%, rgba(255,255,255,0.08) 70%, rgba(255,255,255,0.02) 85%),
+        /* linear-gradient(135deg, #f8fafc 0%, #e9ecef 100%), */
+        url('desktop.jpg');
+      background-size: cover;
+      background-position: center;
+      background-repeat: no-repeat;
+    }
+    @media (max-width: 600px) {
+      body {
+        background-image:
+          radial-gradient(900px 600px at 50% 20%, rgba(255,255,255,0.55), rgba(255,255,255,0.25) 45%, rgba(255,255,255,0.08) 70%, rgba(255,255,255,0.02) 85%),
+          linear-gradient(135deg, #f8fafc 0%, #e9ecef 100%),
+          url('mobile.jpg');
+      }
+    }
+
+    /* Top header */
+    .gallery-top {
+      max-width: 1100px;
+      margin: 22px auto 10px;
+      padding: 0 16px;
+    }
+    .title-row {
+      display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 12px;
+    }
+    .gallery-header {
+      font-family: 'Gloria Hallelujah', cursive, Arial, sans-serif;
+      font-size: 1.7rem;
+      color: var(--accent);
+      letter-spacing: .8px;
+      text-shadow: 1px 1px 0 #fff, 2px 2px 0 #fdcb6e;
+      margin: 0;
+    }
+    .controls {
+      display: flex; gap: 10px; flex-wrap: wrap;
+      background: rgba(255,255,255,0.65);
+      border: 1px solid rgba(255,255,255,0.6);
+      border-radius: 14px;
+      padding: 10px;
+      backdrop-filter: blur(10px) saturate(140%);
+      -webkit-backdrop-filter: blur(10px) saturate(140%);
+      box-shadow: var(--shadow);
+    }
+    .search {
+      position: relative; min-width: 220px; flex: 1 1 260px;
+    }
+    .search input {
+      width: 100%; padding: 10px 12px 10px 40px; border-radius: 12px; border: 1.5px solid var(--border);
+      background: #fff; font-size: 0.98rem; color: #111827;
+      transition: border-color .2s, box-shadow .2s;
+    }
+    .search input:focus { border-color: var(--accent); box-shadow: 0 0 0 4px rgba(0,122,255,.12); outline: none; }
+    .search svg { position: absolute; left: 12px; top: 50%; transform: translateY(-50%); color: #94a3b8; }
+
+    .chip {
+      padding: 8px 12px; border-radius: 12px; border: 1.5px solid var(--border); background: #fff; color: #111827;
+      font-weight: 600; font-size: .92rem; cursor: pointer; transition: background .2s, color .2s, border .2s;
+      user-select: none;
+    }
+    .chip.active { background: linear-gradient(90deg, var(--accent) 0%, var(--accent-2) 100%); color: #fff; border-color: transparent; }
+
+    /* Grid */
+    .public-gallery-grid {
+      max-width: 1100px; margin: 10px auto 28px; padding: 0 16px;
+      display: grid; gap: 16px;
+      grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+    }
+    @media (max-width: 600px) {
+      .public-gallery-grid { grid-template-columns: repeat(auto-fill, minmax(110px, 1fr)); gap: 10px; }
+    }
+
+    .gallery-card {
+      background: var(--card); border-radius: 16px; border: 1.5px solid var(--border);
+      box-shadow: var(--shadow); overflow: hidden; position: relative; transition: transform .2s, box-shadow .2s, border-color .2s;
+    }
+    .gallery-card:hover { transform: translateY(-2px); border-color: var(--accent); box-shadow: 0 16px 40px rgba(0,122,255,0.12); }
+    .img-box { position: relative; aspect-ratio: 1 / 1; display: flex; align-items: center; justify-content: center; overflow: hidden; }
+    .img-box img { width: 100%; height: 100%; object-fit: cover; display: block; }
+
+    .card-actions {
+      position: absolute; top: 8px; right: 8px; display: flex; gap: 6px; opacity: 0; transform: translateY(-6px);
+      transition: opacity .2s, transform .2s;
+    }
+    .gallery-card:hover .card-actions { opacity: 1; transform: translateY(0); }
+    @media (hover: none) { .card-actions { opacity: 1; transform: none; } }
+
+    .icon-btn {
+      background: rgba(255,255,255,0.95); border: none; width: 34px; height: 34px; border-radius: 50%;
+      display: grid; place-items: center; color: #475569; cursor: pointer; box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+      transition: background .2s, color .2s, transform .08s;
+    }
+    .icon-btn:hover { background: #eef2f7; color: var(--accent); }
+    .icon-btn:active { transform: translateY(1px); }
+    .icon-btn.danger:hover { color: var(--danger); }
+
+    .caption {
+      display: flex; align-items: center; justify-content: center; gap: 6px;
+      padding: 8px 10px 12px; color: var(--muted); font-size: .95rem;
+    }
+    .uploader-tag {
+      background: #f8fafc; border: 1px solid var(--border); color: #111827; border-radius: 999px;
+      padding: 4px 10px; font-weight: 600; font-size: .85rem;
+    }
+
+    /* Skeletons */
+    .skeleton {
+      background: #fff; border-radius: 16px; border: 1.5px solid var(--border); overflow: hidden;
+    }
+    .skeleton .sk-img {
+      aspect-ratio: 1 / 1; width: 100%;
+      background: linear-gradient(90deg, #f4f6f8 25%, #e9edf2 37%, #f4f6f8 63%);
+      background-size: 400% 100%; animation: shimmer 1.2s infinite;
+    }
+    .skeleton .sk-cap { height: 36px; background: #fff; }
+    @keyframes shimmer { 0% {background-position: 100% 0;} 100% {background-position: 0 0;} }
+
+    /* Empty state */
+    .empty {
+      grid-column: 1 / -1; text-align: center; color: var(--muted); background: rgba(255,255,255,.7);
+      border: 1px dashed var(--border); padding: 18px; border-radius: 14px;
+    }
+
+    /* Bottom bar */
+    .bottom-bar {
+      position: fixed; left: 0; right: 0; bottom: 0; height: 60px; background: #fff;
+      border-top: 1.5px solid var(--border); box-shadow: 0 -2px 12px rgba(0,0,0,0.04);
+      display: flex; justify-content: space-around; align-items: center; z-index: 100;
+    }
+    .bottom-bar a {
+      flex: 1; text-align: center; color: #636e72; text-decoration: none; font-size: 1.05rem; font-weight: 600;
+      padding: 0.5em 0; border-radius: 10px; transition: background .2s, color .2s; display: flex; flex-direction: column; align-items: center;
+    }
+    .bottom-bar a.active, .bottom-bar a:hover { background: #f1f3f6; color: var(--accent); }
+    .icon { font-size: 1.35em; margin-bottom: 2px; display: block; }
+
+    /* Lightbox */
+    .lightbox {
+      position: fixed; inset: 0; background: rgba(0,0,0,0.6); display: none; align-items: center; justify-content: center; z-index: 200;
+      padding: 20px;
+    }
+    .lightbox.open { display: flex; }
+    .lightbox-inner {
+      background: #fff; border-radius: 16px; max-width: 92vw; max-height: 88vh; display: grid; gap: 10px;
+      padding: 12px; box-shadow: var(--shadow);
+    }
+    .lightbox-img { max-width: 86vw; max-height: 70vh; object-fit: contain; border-radius: 12px; }
+    .lightbox-actions { display: flex; justify-content: space-between; align-items: center; gap: 10px; }
+    .lb-left { font-weight: 600; color: #111827; }
+    .lb-right { display: flex; gap: 8px; }
+
+    /* Toast */
+    .toast {
+      position: fixed; bottom: 76px; left: 50%; transform: translateX(-50%); padding: 10px 14px; border-radius: 10px;
+      background: rgba(17,24,39,.9); color: #fff; font-size: .95rem; display: none; z-index: 250;
+    }
+    .toast.show { display: block; animation: fadeOut 2.2s both; }
+    @keyframes fadeOut { 0% {opacity: 0;} 10% {opacity: 1;} 80% {opacity: 1;} 100% {opacity: 0;} }
+  </style>
+</head>
+<body>
+
+  <div class="gallery-top">
+    <div class="title-row">
+      <h1 class="gallery-header">Public Gallery</h1>
+    </div>
+    <div class="controls">
+      <div class="search">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M21 21l-4.3-4.3M10.5 18a7.5 7.5 0 1 1 0-15 7.5 7.5 0 0 1 0 15Z" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+        <input id="search" type="text" placeholder="Search by uploader...">
+      </div>
+      <button id="chipMine" class="chip" aria-pressed="false">My uploads</button>
+    </div>
+  </div>
+
+  <div class="public-gallery-grid" id="gallery">
+    <!-- skeletons -->
+  </div>
+
+  <!-- Lightbox -->
+  <div class="lightbox" id="lightbox" aria-modal="true" role="dialog">
+    <div class="lightbox-inner">
+      <img id="lbImg" class="lightbox-img" src="" alt="">
+      <div class="lightbox-actions">
+        <div class="lb-left" id="lbCaption"></div>
+        <div class="lb-right">
+          <button class="icon-btn" id="lbDownload" title="Download">
+            <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v8m0 0l-4-4m4 4l4-4M5 19h14"/></svg>
+          </button>
+          <button class="icon-btn danger" id="lbDelete" title="Delete" style="display:none;">
+            <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m5 0V4a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2v2"></path></svg>
+          </button>
+          <button class="icon-btn" id="lbClose" title="Close">
+            <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 6l12 12M18 6L6 18"/></svg>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast -->
+  <div class="toast" id="toast">Done</div>
+
+  <!-- Bottom Navigation Bar -->
+  <nav class="bottom-bar">
+    <a href="dashboard.html" class="active"><span class="icon"><img src="home.png" alt="" height="20px"></span>Home</a>
+    <a href="public.html"  class="active"><span class="icon"><img src="gallery.png" alt="" height="20px"></span>Gallery</a>
+    <a href="upload.html" ><span class="icon"><img src="upload.png" alt="" height="20px"></span>Upload</a>
+    <a href="profile.html"><span class="icon"><img src="profile.png" alt="" height="20px"></span>Profile</a>
+    <a href="index.html" onclick="localStorage.clear()"><span class="icon"><img src="logout.png" alt="" height="20px"></span>Logout</a>
+  </nav>
+
+
+  <script>
+    const galleryEl = document.getElementById('gallery');
+    const searchEl = document.getElementById('search');
+    const chipMine = document.getElementById('chipMine');
+    const lb = document.getElementById('lightbox');
+    const lbImg = document.getElementById('lbImg');
+    const lbCaption = document.getElementById('lbCaption');
+    const lbDownload = document.getElementById('lbDownload');
+    const lbDelete = document.getElementById('lbDelete');
+    const lbClose = document.getElementById('lbClose');
+    const toast = document.getElementById('toast');
+
+    let currentUser = '';
+    let images = [];
+    let onlyMine = false;
+
+    // Skeletons
+    function showSkeletons(count = 8) {
+      galleryEl.innerHTML = Array.from({ length: count }).map(() => `
+        <div class="skeleton">
+          <div class="sk-img"></div>
+          <div class="sk-cap"></div>
+        </div>
+      `).join('');
+    }
+    showSkeletons();
+
+    // Fetch user + images
+    Promise.all([
+      fetch('/api/dashboard', { headers: { 'x-session-id': localStorage.getItem('sessionId') || '' } })
+        .then(r => r.ok ? r.json() : { name: '' })
+        .catch(() => ({ name: '' })),
+      fetch('/api/public').then(r => r.json())
+    ]).then(([user, imgs]) => {
+      currentUser = user.name || '';
+      images = imgs || [];
+      render();
+    });
+
+    function render() {
+      const term = (searchEl.value || '').trim().toLowerCase();
+      let filtered = images.filter(img => !term || (img.uploader || '').toLowerCase().includes(term));
+      if (onlyMine && currentUser) {
+        filtered = filtered.filter(img => img.uploader === currentUser);
+      }
+      if (!filtered.length) {
+        galleryEl.innerHTML = `<div class="empty">No images found${term ? ` for “${term}”` : ''}.</div>`;
+        return;
+      }
+      galleryEl.innerHTML = filtered.map(img => {
+        const isOwner = currentUser && img.uploader === currentUser;
+        return `
+          <div class="gallery-card" data-fn="${img.filename}" data-up="${img.uploader}">
+            <div class="img-box" role="button" tabindex="0" aria-label="View image by ${img.uploader}">
+              <img loading="lazy" src="/uploads/${img.filename}" alt="Artwork by ${img.uploader}">
+              <div class="card-actions">
+                <button class="icon-btn" title="Download" data-act="download">
+                  <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v8m0 0l-4-4m4 4l4-4M5 19h14"/></svg>
+                </button>
+                ${isOwner ? `
+                <button class="icon-btn danger" title="Delete" data-act="delete">
+                  <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m5 0V4a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2v2"></path></svg>
+                </button>` : ''}
+              </div>
+            </div>
+            <div class="caption"><span class="uploader-tag">@${img.uploader}</span></div>
+          </div>`;
+      }).join('');
+    }
+
+    // Search + chip events
+    searchEl.addEventListener('input', () => render());
+    chipMine.addEventListener('click', () => {
+      onlyMine = !onlyMine;
+      chipMine.classList.toggle('active', onlyMine);
+      chipMine.setAttribute('aria-pressed', String(onlyMine));
+      render();
+    });
+
+    // Delegated gallery actions
+    galleryEl.addEventListener('click', (e) => {
+      const card = e.target.closest('.gallery-card');
+      if (!card) return;
+      const fn = card.dataset.fn;
+      const up = card.dataset.up;
+
+      // Action buttons
+      const btn = e.target.closest('[data-act]');
+      if (btn) {
+        const act = btn.getAttribute('data-act');
+        if (act === 'download') return downloadImage(fn);
+        if (act === 'delete') return deleteImage(fn, card);
+      } else {
+        // Open lightbox on image/cell click
+        openLightbox(fn, up);
+      }
+    });
+
+    // Lightbox
+    function openLightbox(filename, uploader) {
+      lbImg.src = '/uploads/' + filename;
+      lbImg.alt = 'Artwork by ' + uploader;
+      lbCaption.textContent = '@' + uploader;
+      lbDownload.onclick = () => downloadImage(filename);
+
+      // Show delete only if owner
+      const isOwner = currentUser && uploader === currentUser;
+      lbDelete.style.display = isOwner ? 'grid' : 'none';
+      lbDelete.onclick = () => deleteImage(filename, null, true);
+
+      lb.classList.add('open');
+    }
+    lbClose.addEventListener('click', () => lb.classList.remove('open'));
+    lb.addEventListener('click', (e) => { if (e.target === lb) lb.classList.remove('open'); });
+    document.addEventListener('keydown', (e) => { if (e.key === 'Escape') lb.classList.remove('open'); });
+
+    // Download
+    function downloadImage(filename) {
+      const a = document.createElement('a');
+      a.href = '/uploads/' + filename;
+      a.download = filename;
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      showToast('Downloading...');
+    }
+
+    // Delete
+    function deleteImage(filename, cardEl, fromLightbox = false) {
+      if (!confirm('Delete this image?')) return;
+      fetch('/api/delete', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'x-session-id': localStorage.getItem('sessionId') || ''
+        },
+        body: JSON.stringify({ filename })
+      })
+      .then(r => r.json())
+      .then(res => {
+        if (res.success) {
+          // Remove from local data + DOM
+          images = images.filter(i => i.filename !== filename);
+          if (cardEl) cardEl.remove();
+          if (fromLightbox) lb.classList.remove('open');
+          render();
+          showToast('Image deleted');
+        } else {
+          alert(res.error || 'Delete failed');
+        }
+      })
+      .catch(() => alert('Delete failed'));
+    }
+
+    // Toast
+    function showToast(msg) {
+      toast.textContent = msg;
+      toast.classList.add('show');
+      setTimeout(() => toast.classList.remove('show'), 2200);
+    }
+  </script>
+</body>
+</html>

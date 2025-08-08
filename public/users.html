@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Registered Users - Art Gallery</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&family=Gloria+Hallelujah&display=swap" rel="stylesheet">
+  <style>
+    body {
+      min-height: 100vh;
+      background: linear-gradient(135deg, #f8fafc 0%, #e9ecef 100%);
+      font-family: 'Inter', Arial, sans-serif;
+      margin: 0;
+      padding: 0 0 70px 0;
+    }
+    .users-header {
+      font-family: 'Gloria Hallelujah', cursive, Arial, sans-serif;
+      font-size: 1.7rem;
+      color: #007aff;
+      margin: 2.2rem auto 1.2rem auto;
+      text-align: center;
+      letter-spacing: 1px;
+      text-shadow: 1px 1px 0 #fff, 2px 2px 0 #fdcb6e;
+    }
+    .users-list {
+      max-width: 500px;
+      margin: 0 auto 2.5rem auto;
+      background: #fff;
+      border-radius: 18px;
+      box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+      border: 1.5px solid #e9ecef;
+      padding: 1.5rem 1rem;
+    }
+    .user-row {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      padding: 0.7rem 0;
+      border-bottom: 1px solid #f1f3f6;
+    }
+    .user-row:last-child {
+      border-bottom: none;
+    }
+    .user-avatar {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #ffeaa7 60%, #fdcb6e 100%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.3rem;
+      color: #e17055;
+      font-family: 'Gloria Hallelujah', cursive, Arial, sans-serif;
+      font-weight: bold;
+      box-shadow: 0 1px 4px rgba(0,0,0,0.07);
+      border: 2px solid #e17055;
+    }
+    .user-name {
+      font-size: 1.1rem;
+      color: #222;
+      font-family: 'Inter', Arial, sans-serif;
+      font-weight: 600;
+      flex: 1;
+    }
+    .user-count {
+      font-size: 0.98rem;
+      color: #636e72;
+      background: #f8fafc;
+      border-radius: 8px;
+      padding: 0.2em 0.7em;
+      font-family: 'Inter', Arial, sans-serif;
+    }
+    /* Bottom Navigation Bar */
+    .bottom-bar {
+      position: fixed;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      height: 60px;
+      background: #fff;
+      border-top: 1.5px solid #e9ecef;
+      box-shadow: 0 -2px 12px rgba(0,0,0,0.04);
+      display: flex;
+      justify-content: space-around;
+      align-items: center;
+      z-index: 100;
+    }
+    .bottom-bar a {
+      flex: 1;
+      text-align: center;
+      color: #636e72;
+      text-decoration: none;
+      font-size: 1.1rem;
+      font-family: 'Inter', Arial, sans-serif;
+      font-weight: 600;
+      padding: 0.5em 0;
+      border-radius: 10px;
+      transition: background 0.2s, color 0.2s;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+    }
+    .bottom-bar a.active,
+    .bottom-bar a:hover {
+      background: #f1f3f6;
+      color: #007aff;
+    }
+    .bottom-bar .icon {
+      font-size: 1.4em;
+      margin-bottom: 2px;
+      display: block;
+    }
+    @media (max-width: 600px) {
+      .users-header {
+        font-size: 1.2rem;
+        margin-top: 1.2rem;
+      }
+      .users-list {
+        padding: 1rem 0.3rem;
+      }
+      .user-row {
+        gap: 0.5rem;
+      }
+      .user-avatar {
+        width: 32px;
+        height: 32px;
+        font-size: 1rem;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="users-header">Registered Users</div>
+  <div class="users-list" id="usersList">
+    <div style="text-align:center; color:#636e72;">Loading...</div>
+  </div>
+
+  <!-- Bottom Navigation Bar -->
+  <nav class="bottom-bar">
+    <a href="dashboard.html"><span class="icon">🏠</span>Home</a>
+    <a href="public.html"><span class="icon">🌐</span>Gallery</a>
+    <a href="upload.html"><span class="icon">➕</span>Upload</a>
+    <a href="profile.html"><span class="icon">👤</span>Profile</a>
+    <a href="users.html" class="active"><span class="icon">🧑‍🤝‍🧑</span>Users</a>
+    <a href="index.html" onclick="localStorage.clear()"><span class="icon">🚪</span>Logout</a>
+  </nav>
+
+  <script>
+    fetch('/api/users')
+      .then(res => res.json())
+      .then(users => {
+        const usersList = document.getElementById('usersList');
+        if (!users.length) {
+          usersList.innerHTML = '<div style="text-align:center; color:#636e72;">No users registered yet.</div>';
+        } else {
+          usersList.innerHTML = users.map(user =>
+            `<div class="user-row">
+              <div class="user-avatar">${user.name[0].toUpperCase()}</div>
+              <div class="user-name">${user.name}</div>
+              <div class="user-count">${user.imageCount} image${user.imageCount !== 1 ? 's' : ''}</div>
+            </div>`
+          ).join('');
+        }
+      });
+  </script>
+</body>
+</html>

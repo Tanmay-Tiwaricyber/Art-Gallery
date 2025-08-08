@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Splash • Art Gallery</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <!-- Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&family=Gloria+Hallelujah&display=swap" rel="stylesheet">
+  <style>
+    :root{
+      --accent: #e17055;
+      --accent-2: #fdcb6e;
+      --muted: #64748b;
+      --shadow: 0 20px 60px rgba(16,24,40,.18);
+    }
+    * { box-sizing: border-box; }
+    html, body { height: 100%; }
+    body {
+      margin: 0;
+      font-family: 'Inter', Arial, sans-serif;
+      color: #111827;
+      display: grid;
+      place-items: center;
+      background-image:
+        radial-gradient(1200px 800px at 50% 20%, rgba(255,255,255,0.55), rgba(255,255,255,0.25) 45%, rgba(255,255,255,0.08) 70%, rgba(255,255,255,0.02) 85%),
+        /* linear-gradient(135deg, #f8fafc 0%, #e9ecef 100%), */
+        url('desktop.jpg');
+      background-size: cover;
+      background-position: center;
+      background-repeat: no-repeat;
+    }
+    @media (max-width: 600px) {
+      body {
+        background-image:
+          radial-gradient(900px 600px at 50% 20%, rgba(255,255,255,0.55), rgba(255,255,255,0.25) 45%, rgba(255,255,255,0.08) 70%, rgba(255,255,255,0.02) 85%),
+          /* linear-gradient(135deg, #f8fafc 0%, #e9ecef 100%), */
+          url('mobile.jpg');
+      }
+    }
+
+    .splash {
+      width: min(92vw, 520px);
+      background: rgba(255,255,255,0.7);
+      border: 1px solid rgba(255,255,255,0.6);
+      border-radius: 22px;
+      backdrop-filter: blur(14px) saturate(160%);
+      -webkit-backdrop-filter: blur(14px) saturate(160%);
+      box-shadow: var(--shadow);
+      padding: 28px 22px 20px;
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .logo-wrap {
+      position: relative;
+      width: 96px; height: 96px;
+      margin: 0 auto 14px;
+    }
+    .logo {
+      position: absolute; inset: 12px;
+      border-radius: 50%;
+      display: grid; place-items: center;
+      font-size: 2rem; color: var(--accent);
+      background: linear-gradient(135deg, #fff6e6, #ffe2cf);
+      border: 2.5px solid var(--accent);
+      z-index: 2;
+    }
+    .ring {
+      position: absolute; inset: 0; border-radius: 50%;
+      padding: 3px;
+      background: conic-gradient(from 0deg, var(--accent), var(--accent-2), #ffd6a6, var(--accent));
+      -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+      -webkit-mask-composite: xor; mask-composite: exclude;
+      animation: spin 1.6s linear infinite;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    @media (prefers-reduced-motion: reduce) {
+      .ring { animation: none; }
+    }
+
+    .title {
+      font-family: 'Gloria Hallelujah', cursive, Arial, sans-serif;
+      font-size: 1.8rem;
+      letter-spacing: .6px;
+      color: var(--accent);
+      margin: 4px 0 6px;
+      text-shadow: 1px 1px 0 #fff, 2px 2px 0 var(--accent-2);
+    }
+    .tagline {
+      color: var(--muted);
+      margin: 0 0 16px;
+      font-size: 1rem;
+    }
+
+    .progress {
+      height: 10px;
+      background: #eef2f7;
+      border-radius: 999px;
+      overflow: hidden;
+      margin: 10px auto 0;
+      width: 82%;
+      position: relative;
+    }
+    .bar {
+      height: 100%;
+      width: 40%;
+      background: linear-gradient(90deg, var(--accent) 0%, var(--accent-2) 100%);
+      border-radius: inherit;
+      animation: indet 1.2s infinite ease-in-out;
+    }
+    @keyframes indet {
+      0% { transform: translateX(-100%); }
+      50% { transform: translateX(10%); }
+      100% { transform: translateX(120%); }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      .bar { animation: none; width: 55%; }
+    }
+
+    .foot {
+      margin-top: 14px;
+      color: #334155;
+      font-size: .95rem;
+      opacity: .9;
+    }
+
+    .actions {
+      margin-top: 16px;
+      display: flex;
+      justify-content: center;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+    .btn {
+      padding: 10px 14px;
+      border-radius: 12px;
+      border: 1.5px solid #e9ecef;
+      background: #fff;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background .2s, transform .06s;
+    }
+    .btn:hover { background: #f7fafc; }
+    .btn:active { transform: translateY(1px); }
+    .btn.primary {
+      background: linear-gradient(90deg, var(--accent) 0%, var(--accent-2) 100%);
+      color: #fff;
+      border-color: transparent;
+    }
+    .btn.primary:hover { filter: brightness(1.05); }
+  </style>
+</head>
+<body>
+  <div class="splash" role="dialog" aria-live="polite">
+    <div class="logo-wrap" aria-hidden="true">
+      <!-- <div class="ring"></div> -->
+      <div class="logo"><img src="logo.webp" alt="" height="100px"></div>
+    </div>
+    <div class="title">Art Gallery</div>
+    <div class="tagline">Loading your creative space…</div>
+
+    <div class="progress" aria-hidden="true">
+      <div class="bar"></div>
+    </div>
+
+    <div class="actions">
+      <button class="btn" id="skipBtn" type="button">Skip</button>
+      <button class="btn primary" id="enterBtn" type="button">Enter</button>
+    </div>
+
+    <div class="foot">Tip: use the same name to see your previous uploads.</div>
+  </div>
+
+  <script>
+    // Intelligent redirect: Dashboard if session valid, else Login
+    const sessionId = localStorage.getItem('sessionId') || '';
+    let next = 'index.html';
+
+    async function decideRoute() {
+      if (!sessionId) return 'index.html';
+      try {
+        const ctrl = new AbortController();
+        const t = setTimeout(() => ctrl.abort(), 1500);
+        const res = await fetch('/api/dashboard', { headers: { 'x-session-id': sessionId }, signal: ctrl.signal });
+        clearTimeout(t);
+        if (res.ok) {
+          const data = await res.json();
+          if (!data.error && data.name) return 'dashboard.html';
+        }
+      } catch (_) {}
+      return 'index.html';
+    }
+
+    function go(url){ window.location.href = url; }
+
+    // Auto proceed after a short delay
+    (async () => {
+      next = await decideRoute();
+      const delay = 1800; // ms
+      const timer = setTimeout(() => go(next), delay);
+
+      // Buttons
+      document.getElementById('skipBtn').onclick = () => { clearTimeout(timer); go('index.html'); };
+      document.getElementById('enterBtn').onclick = () => { clearTimeout(timer); go(next); };
+    })();
+  </script>
+</body>
+</html>
